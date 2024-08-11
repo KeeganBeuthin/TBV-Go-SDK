@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/yourusername/go-financial-sdk/pkg/utils"
+	"github.com/KeeganBeuthin/TBV-Go-SDK/pkg/utils"
 )
 
 var globalAmount float64
