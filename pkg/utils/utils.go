@@ -1,3 +1,6 @@
+//go:build js && wasm
+// +build js,wasm
+
 package utils
 
 import (
@@ -40,17 +43,6 @@ func CreateSuccessResult(message string) *byte {
 	return StringToPtr(message)
 }
 
-// // WebAssembly version
-// //go:build js && wasm
-
-// //go:wasm-module env
-// //export malloc
-// func malloc(size int32) unsafe.Pointer
-
-// // Non-WebAssembly version
-// //go:build !js || !wasm
-
-// func malloc(size int32) unsafe.Pointer {
-// 	buf := make([]byte, size)
-// 	return unsafe.Pointer(&buf[0])
-// }
+//go:wasmimport env malloc
+//export malloc
+func malloc(size int32) unsafe.Pointer
