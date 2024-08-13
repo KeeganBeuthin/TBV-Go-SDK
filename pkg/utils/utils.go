@@ -14,15 +14,17 @@ func GoString(ptr *byte, length int32) string {
 	}
 	if length < 0 {
 		// Find null terminator
-		end := ptr
-		for *end != 0 {
-			end = (*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(end)) + 1))
+		p := unsafe.Pointer(ptr)
+		for i := 0; ; i++ {
+			if *(*byte)(p) == 0 {
+				length = int32(i)
+				break
+			}
+			p = unsafe.Add(p, 1)
 		}
-		length = int32(uintptr(unsafe.Pointer(end)) - uintptr(unsafe.Pointer(ptr)))
 	}
-	return string(unsafe.Slice(ptr, length))
+	return unsafe.String(ptr, int(length))
 }
-
 func StringToPtr(s string) *byte {
 	bytes := []byte(s)
 	ptr := malloc(int32(len(bytes) + 1))
@@ -44,9 +46,18 @@ func CreateSuccessResult(message string) *byte {
 }
 
 //go:wasmimport env malloc
-func wasmMalloc(size uint32) uintptr
+func wasmMalloc(size uint32) int32
 
-// malloc is a wrapper around wasmMalloc that returns unsafe.Pointer
 func malloc(size int32) unsafe.Pointer {
-	return unsafe.Pointer(wasmMalloc(uint32(size)))
+	if size <= 0 {
+		return nil
+	}
+	ptr := wasmMalloc(uint32(size))
+	return unsafe.Pointer(uintptr(ptr))
+}
+
+// Free is a placeholder for freeing memory (if needed)
+func Free(ptr unsafe.Pointer) {
+	// Implementation depends on whether WebAssembly environment provides a free function
+	// For now, we'll leave it empty
 }
