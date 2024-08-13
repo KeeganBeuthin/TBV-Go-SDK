@@ -1,17 +1,17 @@
-//go:build !js || !wasm
-// +build !js !wasm
+// //go:build !js || !wasm
+// // +build !js !wasm
 
-package utils
+// package utils
 
-import "unsafe"
+// import "unsafe"
 
-type nativeAllocator struct{}
+// type nativeAllocator struct{}
 
-func (n nativeAllocator) Malloc(size int32) unsafe.Pointer {
-	buf := make([]byte, size)
-	return unsafe.Pointer(&buf[0])
-}
+// func (n nativeAllocator) Malloc(size int32) unsafe.Pointer {
+// 	buf := make([]byte, size)
+// 	return unsafe.Pointer(&buf[0])
+// }
 
-func getMemoryAllocator() MemoryAllocator {
-	return nativeAllocator{}
-}
+// func getMemoryAllocator() MemoryAllocator {
+// 	return nativeAllocator{}
+// }

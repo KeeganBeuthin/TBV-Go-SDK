@@ -5,18 +5,6 @@ import (
 	"unsafe"
 )
 
-// MemoryAllocator is an interface for memory allocation
-type MemoryAllocator interface {
-	Malloc(size int32) unsafe.Pointer
-}
-
-var allocator MemoryAllocator
-
-func init() {
-	// The actual implementation will be set in platform-specific files
-	allocator = getMemoryAllocator()
-}
-
 func GoString(ptr *byte, length int32) string {
 	if ptr == nil {
 		return ""
@@ -34,7 +22,7 @@ func GoString(ptr *byte, length int32) string {
 
 func StringToPtr(s string) *byte {
 	bytes := []byte(s)
-	ptr := allocator.Malloc(int32(len(bytes) + 1))
+	ptr := malloc(int32(len(bytes) + 1))
 	if ptr == nil {
 		fmt.Println("Error: Failed to allocate memory")
 		return nil
@@ -51,3 +39,18 @@ func CreateErrorResult(message string) *byte {
 func CreateSuccessResult(message string) *byte {
 	return StringToPtr(message)
 }
+
+// // WebAssembly version
+// //go:build js && wasm
+
+// //go:wasm-module env
+// //export malloc
+// func malloc(size int32) unsafe.Pointer
+
+// // Non-WebAssembly version
+// //go:build !js || !wasm
+
+// func malloc(size int32) unsafe.Pointer {
+// 	buf := make([]byte, size)
+// 	return unsafe.Pointer(&buf[0])
+// }

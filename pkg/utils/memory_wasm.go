@@ -1,20 +1,21 @@
-//go:build js && wasm
-// +build js,wasm
+js && wasm
 
-package utils
+package p // // +build js,wasm
 
-import "unsafe"
+// package utils
 
-type wasmAllocator struct{}
+// import "unsafe"
 
-//go:wasm-module env
-//export malloc
-func wasmMalloc(size int32) unsafe.Pointer
+// type wasmAllocator struct{}
 
-func (w wasmAllocator) Malloc(size int32) unsafe.Pointer {
-	return wasmMalloc(size)
-}
+// //go:wasm-module env
+// //export malloc
+// func wasmMalloc(size int32) unsafe.Pointer
 
-func getMemoryAllocator() MemoryAllocator {
-	return wasmAllocator{}
-}
+// func (w wasmAllocator) Malloc(size int32) unsafe.Pointer {
+// 	return wasmMalloc(size)
+// }
+
+// func getMemoryAllocator() MemoryAllocator {
+// 	return wasmAllocator{}
+// }
