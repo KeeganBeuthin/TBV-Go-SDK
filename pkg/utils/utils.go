@@ -44,5 +44,9 @@ func CreateSuccessResult(message string) *byte {
 }
 
 //go:wasmimport env malloc
-//export malloc
-func malloc(size int32) unsafe.Pointer
+func wasmMalloc(size uint32) uintptr
+
+// malloc is a wrapper around wasmMalloc that returns unsafe.Pointer
+func malloc(size int32) unsafe.Pointer {
+	return unsafe.Pointer(wasmMalloc(uint32(size)))
+}
