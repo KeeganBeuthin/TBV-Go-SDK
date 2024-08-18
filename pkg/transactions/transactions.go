@@ -32,31 +32,35 @@ func ExecuteCreditLeg(amountPtr *byte, amountLen int32, accountPtr *byte, accoun
 	return utils.StringToPtr(query)
 }
 
-func ProcessCreditResult(resultPtr *byte) *byte {
-	if resultPtr == nil {
-		return utils.CreateErrorResult("Error executing RDF query")
+func ProcessCreditResult(result *string) *string {
+	if result == nil {
+		fmt.Println("ProcessCreditResult: Received nil pointer")
+		return nil
 	}
-	resultStr := utils.GoString(resultPtr, -1)
-	fmt.Printf("Processing credit result: %s\n", resultStr)
-	var queryResult struct {
+	fmt.Printf("ProcessCreditResult called with result: %s\n", *result)
+	var data struct {
 		Results []struct {
 			Balance json.Number `json:"balance"`
 		} `json:"results"`
 	}
-	err := json.Unmarshal([]byte(resultStr), &queryResult)
+	err := json.Unmarshal([]byte(*result), &data)
 	if err != nil {
-		return utils.CreateErrorResult(fmt.Sprintf("Error parsing JSON: %v", err))
+		fmt.Printf("Error unmarshaling result: %v\n", err)
+		return nil
 	}
-	if len(queryResult.Results) == 0 {
-		return utils.CreateErrorResult("Invalid result format")
+	if len(data.Results) == 0 {
+		return nil
 	}
-	balance, err := queryResult.Results[0].Balance.Float64()
+	balanceStr := data.Results[0].Balance.String()
+	if balanceStr == "" || balanceStr == "null" {
+		return nil
+	}
+	balance, err := data.Results[0].Balance.Float64()
 	if err != nil {
-		return utils.CreateErrorResult(fmt.Sprintf("Invalid balance format: %v", err))
+		return nil
 	}
-	newBalance := balance + globalAmount
-	message := fmt.Sprintf("Current balance: %.2f. After credit of %.2f, new balance: %.2f", balance, globalAmount, newBalance)
-	return utils.CreateSuccessResult(message)
+	message := fmt.Sprintf("Current balance: %.2f", balance)
+	return &message
 }
 
 func ExecuteDebitLeg(amountPtr *byte, amountLen int32, accountPtr *byte, accountLen int32) *byte {
