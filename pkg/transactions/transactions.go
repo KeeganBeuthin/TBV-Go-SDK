@@ -55,8 +55,9 @@ func ProcessCreditResult(result *string) *string {
 	if balanceStr == "" || balanceStr == "null" {
 		return nil
 	}
-	balance, err := data.Results[0].Balance.Float64()
+	balance, err := strconv.ParseFloat(balanceStr, 64)
 	if err != nil {
+		fmt.Printf("Error parsing balance: %v\n", err)
 		return nil
 	}
 	message := fmt.Sprintf("Current balance: %.2f", balance)
