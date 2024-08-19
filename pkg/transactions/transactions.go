@@ -13,7 +13,7 @@ import (
 
 var globalAmount float64
 
-func ExecuteCreditLeg(amountPtr *byte, amountLen int32, accountPtr *byte, accountLen int32) *byte {
+func Execute_Credit_Leg(amountPtr *byte, amountLen int32, accountPtr *byte, accountLen int32) *byte {
 	amount := utils.GoString(amountPtr, amountLen)
 	account := utils.GoString(accountPtr, accountLen)
 	amountFloat, err := strconv.ParseFloat(amount, 64)
@@ -32,7 +32,7 @@ func ExecuteCreditLeg(amountPtr *byte, amountLen int32, accountPtr *byte, accoun
 	return utils.StringToPtr(query)
 }
 
-func ProcessCreditResult(result *string) *string {
+func Process_Credit_Result(result *string) *string {
 	if result == nil {
 		fmt.Println("ProcessCreditResult: Received nil pointer")
 		return nil
@@ -64,7 +64,7 @@ func ProcessCreditResult(result *string) *string {
 	return &message
 }
 
-func ExecuteDebitLeg(amountPtr *byte, amountLen int32, accountPtr *byte, accountLen int32) *byte {
+func Execute_Debit_Leg(amountPtr *byte, amountLen int32, accountPtr *byte, accountLen int32) *byte {
 	amount := utils.GoString(amountPtr, amountLen)
 	account := utils.GoString(accountPtr, accountLen)
 	message := fmt.Sprintf("Debiting %s from account %s", amount, account)
