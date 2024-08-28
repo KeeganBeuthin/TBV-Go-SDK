@@ -5,6 +5,7 @@ package utils
 
 import (
 	"fmt"
+	"os"
 	"unsafe"
 )
 
@@ -54,6 +55,15 @@ func malloc(size int32) unsafe.Pointer {
 	}
 	ptr := wasmMalloc(uint32(size))
 	return unsafe.Pointer(uintptr(ptr))
+}
+
+// ReadHtmlFile reads the content of an HTML file and returns it as a string
+func ReadHtmlFile(filePath string) (string, error) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", fmt.Errorf("error reading HTML file: %v", err)
+	}
+	return string(content), nil
 }
 
 // Free is a placeholder for freeing memory (if needed)
