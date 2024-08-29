@@ -5,7 +5,6 @@ package utils
 
 import (
 	"fmt"
-	"os"
 	"unsafe"
 )
 
@@ -38,12 +37,11 @@ func StringToPtr(s string) *byte {
 }
 
 // ReadHtmlFile reads the content of an HTML file and returns it as a string
-func ReadHtmlFile(filePath string) (string, error) {
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return "", fmt.Errorf("error reading HTML file: %v", err)
+func ReadHtmlFile(content string) (string, error) {
+	if content == "" {
+		return "", fmt.Errorf("error: empty content provided")
 	}
-	return string(content), nil
+	return content, nil
 }
 
 func CreateErrorResult(message string) *byte {
