@@ -36,12 +36,13 @@ func StringToPtr(s string) *byte {
 	return (*byte)(ptr)
 }
 
-// ReadHtmlFile reads the content of an HTML file and returns it as a string
-func ReadHtmlFile(content string) (string, error) {
-	if content == "" {
-		return "", fmt.Errorf("error: empty content provided")
+// ReadHtmlCode processes the given HTML code
+func ReadHtmlCode(htmlCode string) (string, error) {
+	if htmlCode == "" {
+		return "", fmt.Errorf("error: empty HTML code provided")
 	}
-	return content, nil
+	// Here you can add any processing logic if needed
+	return htmlCode, nil
 }
 
 func CreateErrorResult(message string) *byte {
