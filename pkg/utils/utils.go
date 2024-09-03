@@ -25,6 +25,19 @@ func GoString(ptr *byte, length int32) string {
 	}
 	return unsafe.String(ptr, int(length))
 }
+
+func PtrToString(ptr *byte) string {
+	if ptr == nil {
+		return ""
+	}
+	var bytes []byte
+	for *ptr != 0 {
+		bytes = append(bytes, *ptr)
+		ptr = (*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + 1))
+	}
+	return string(bytes)
+}
+
 func StringToPtr(s string) *byte {
 	bytes := []byte(s)
 	ptr := malloc(int32(len(bytes) + 1))
