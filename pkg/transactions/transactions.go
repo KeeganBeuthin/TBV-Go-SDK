@@ -73,7 +73,7 @@ func Execute_Debit_Leg(amountPtr *byte, amountLen int32, accountPtr *byte, accou
 	return utils.StringToPtr(message)
 }
 
-// New function to handle HTTP-like requests
+// HandleHttpRequest handles HTTP-like requests
 func HandleHttpRequest(requestPtr *byte) *byte {
 	request := http.ParseRequest(requestPtr)
 	response := http.HandleRequest(request)
