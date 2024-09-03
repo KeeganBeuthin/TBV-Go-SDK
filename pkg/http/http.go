@@ -39,10 +39,14 @@ func (r Response) Stringify() string {
 	return string(jsonResponse)
 }
 
+func HandleHttpRequest(requestPtr *byte) *byte {
+	request := ParseRequest(requestPtr)
+	response := HandleRequest(request)
+	return utils.StringToPtr(response.Stringify())
+}
+
 func HandleRequest(req Request) Response {
 	switch req.Path {
-	case "/html":
-		return handleHtmlRequest(req)
 	case "/api/data":
 		return handleDataRequest(req)
 	default:
@@ -54,41 +58,9 @@ func HandleRequest(req Request) Response {
 	}
 }
 
-func handleHtmlRequest(req Request) Response {
-	switch req.Method {
-	case "GET":
-		return Response{
-			StatusCode: 200,
-			Headers:    map[string]string{"Content-Type": "text/html"},
-			Body:       "<html><body><h1>Hello from WebAssembly!</h1></body></html>",
-		}
-	case "PUT":
-		// Update HTML content
-		return Response{
-			StatusCode: 200,
-			Headers:    map[string]string{"Content-Type": "text/plain"},
-			Body:       "HTML content updated",
-		}
-	case "DELETE":
-		// Delete HTML content
-		return Response{
-			StatusCode: 200,
-			Headers:    map[string]string{"Content-Type": "text/plain"},
-			Body:       "HTML content deleted",
-		}
-	default:
-		return Response{
-			StatusCode: 405,
-			Headers:    map[string]string{"Content-Type": "text/plain"},
-			Body:       "Method Not Allowed",
-		}
-	}
-}
-
 func handleDataRequest(req Request) Response {
 	switch req.Method {
 	case "GET":
-		// Simulating data retrieval
 		data := map[string]string{"message": "Hello from WebAssembly API!"}
 		jsonData, _ := json.Marshal(data)
 		return Response{
@@ -97,21 +69,18 @@ func handleDataRequest(req Request) Response {
 			Body:       string(jsonData),
 		}
 	case "POST":
-		// Simulating data creation
 		return Response{
 			StatusCode: 201,
 			Headers:    map[string]string{"Content-Type": "application/json"},
 			Body:       `{"message": "Data created successfully"}`,
 		}
 	case "PUT":
-		// Simulating data update
 		return Response{
 			StatusCode: 200,
 			Headers:    map[string]string{"Content-Type": "application/json"},
 			Body:       `{"message": "Data updated successfully"}`,
 		}
 	case "DELETE":
-		// Simulating data deletion
 		return Response{
 			StatusCode: 200,
 			Headers:    map[string]string{"Content-Type": "application/json"},
