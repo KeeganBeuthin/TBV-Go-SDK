@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/KeeganBeuthin/TBV-Go-SDK/pkg/http"
 	"github.com/KeeganBeuthin/TBV-Go-SDK/pkg/utils"
 )
 
