@@ -39,7 +39,7 @@ func (r Response) Stringify() string {
 	return string(jsonResponse)
 }
 
-func HandleHttpRequest(requestPtr *byte) *byte {
+func handle_http_request(requestPtr *byte) *byte {
 	request := ParseRequest(requestPtr)
 	response := HandleRequest(request)
 	return utils.StringToPtr(response.Stringify())
