@@ -32,8 +32,14 @@ func Execute_credit_leg(amountPtr *byte, amountLen int32, accountPtr *byte, acco
 }
 
 func Process_credit_result(resultPtr *byte) *byte {
+	if resultPtr == nil {
+		fmt.Println("Error: Received nil pointer in Process_credit_result")
+		return utils.CreateErrorResult("Error: Received nil pointer")
+	}
+
 	result := utils.GoString(resultPtr, -1)
-	fmt.Printf("Processing result: %s, amount: %.2f\n", result, globalAmount)
+	fmt.Printf("Raw result string: %s\n", result)
+	fmt.Printf("Processing result, global amount: %.2f\n", globalAmount)
 
 	var data struct {
 		Results []struct {
@@ -43,20 +49,30 @@ func Process_credit_result(resultPtr *byte) *byte {
 
 	err := json.Unmarshal([]byte(result), &data)
 	if err != nil {
-		return utils.CreateErrorResult(fmt.Sprintf("Failed to unmarshal result: %v", err))
+		errMsg := fmt.Sprintf("Failed to unmarshal result: %v", err)
+		fmt.Println(errMsg)
+		return utils.CreateErrorResult(errMsg)
 	}
 
+	fmt.Printf("Unmarshaled data: %+v\n", data)
+
 	if len(data.Results) == 0 {
-		return utils.CreateErrorResult("No balance found in result")
+		errMsg := "No balance found in result"
+		fmt.Println(errMsg)
+		return utils.CreateErrorResult(errMsg)
 	}
 
 	balance, err := strconv.ParseFloat(data.Results[0].Balance, 64)
 	if err != nil {
-		return utils.CreateErrorResult(fmt.Sprintf("Invalid balance value: %s", data.Results[0].Balance))
+		errMsg := fmt.Sprintf("Invalid balance value: %s", data.Results[0].Balance)
+		fmt.Println(errMsg)
+		return utils.CreateErrorResult(errMsg)
 	}
 
+	fmt.Printf("Parsed balance: %.2f\n", balance)
+
 	newBalance := balance + globalAmount
-	responseMessage := fmt.Sprintf("Current balance: %.0f. After credit of %.0f, new balance: %.0f", balance, globalAmount, newBalance)
+	responseMessage := fmt.Sprintf("Current balance: %.2f. After credit of %.2f, new balance: %.2f", balance, globalAmount, newBalance)
 	fmt.Println(responseMessage)
 
 	return utils.StringToPtr(responseMessage)
