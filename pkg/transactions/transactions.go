@@ -4,9 +4,9 @@
 package transactions
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/KeeganBeuthin/TBV-Go-SDK/pkg/utils"
 )
@@ -18,7 +18,7 @@ func execute_credit_leg(amountPtr *byte, amountLen int32, accountPtr *byte, acco
 	account := utils.GoString(accountPtr, accountLen)
 	amountFloat, err := strconv.ParseFloat(amount, 64)
 	if err != nil {
-		return utils.CreateErrorResult(fmt.Sprintf("Invalid amount value \"%s\"", amount))
+		return utils.CreateErrorResult(fmt.Sprintf("Error: Invalid amount value: %s", amount))
 	}
 	globalAmount = amountFloat
 	fmt.Printf("Executing credit leg for amount: %s, account: %s\n", amount, account)
@@ -32,36 +32,36 @@ func execute_credit_leg(amountPtr *byte, amountLen int32, accountPtr *byte, acco
 	return utils.StringToPtr(query)
 }
 
-func process_credit_result(result *string) *string {
-	if result == nil {
-		fmt.Println("ProcessCreditResult: Received nil pointer")
-		return nil
+func process_credit_result(resultPtr *byte) *byte {
+	if resultPtr == nil {
+		return utils.CreateErrorResult("Error: Received nil pointer")
 	}
-	fmt.Printf("ProcessCreditResult called with result: %s\n", *result)
-	var data struct {
-		Results []struct {
-			Balance json.Number `json:"balance"`
-		} `json:"results"`
+	result := utils.GoString(resultPtr, -1)
+	fmt.Printf("Processing credit result: %s\n", result)
+
+	// Find the balance value in the JSON string
+	balanceStart := strings.Index(result, `"balance":"`) + 11
+	balanceEnd := strings.Index(result[balanceStart:], `"`)
+
+	if balanceStart > 10 && balanceEnd > 0 {
+		balanceStr := result[balanceStart : balanceStart+balanceEnd]
+		balance, err := strconv.ParseFloat(balanceStr, 64)
+
+		if err == nil {
+			newBalance := balance + globalAmount
+			responseMessage := fmt.Sprintf("Current balance: %.2f. After credit of %.2f, new balance: %.2f", balance, globalAmount, newBalance)
+			fmt.Println(responseMessage)
+			return utils.StringToPtr(responseMessage)
+		} else {
+			errorMessage := fmt.Sprintf("Invalid balance value: %s", balanceStr)
+			fmt.Println(errorMessage)
+			return utils.CreateErrorResult(errorMessage)
+		}
+	} else {
+		errorMessage := "No balance found in result"
+		fmt.Println(errorMessage)
+		return utils.CreateErrorResult(errorMessage)
 	}
-	err := json.Unmarshal([]byte(*result), &data)
-	if err != nil {
-		fmt.Printf("Error unmarshaling result: %v\n", err)
-		return nil
-	}
-	if len(data.Results) == 0 {
-		return nil
-	}
-	balanceStr := data.Results[0].Balance.String()
-	if balanceStr == "" || balanceStr == "null" {
-		return nil
-	}
-	balance, err := strconv.ParseFloat(balanceStr, 64)
-	if err != nil {
-		fmt.Printf("Error parsing balance: %v\n", err)
-		return nil
-	}
-	message := fmt.Sprintf("Current balance: %.2f", balance)
-	return &message
 }
 
 func execute_debit_leg(amountPtr *byte, amountLen int32, accountPtr *byte, accountLen int32) *byte {
